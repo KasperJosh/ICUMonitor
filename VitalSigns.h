@@ -1,9 +1,12 @@
-#ifndef vitalsigns_h
-#define vitalsigns_h
+#ifndef VITALSIGNS_h
+#define VITALSIGNS_h
 
 
-int checkHeartRate (int heartRate);
-
+void checkHeartRate (int heartRate);
+void checkSpO2 (int spo2);
+void checkBP (int systolicBP, int diastolicBP);
+void checkRespRate(int respRate);
+double calculateMAP(int systolicBP, int diastolicBP);
 
 
 #endif 
