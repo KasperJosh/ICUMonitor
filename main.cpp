@@ -2,11 +2,27 @@
 
 using namespace std;
 
+
+void checkHeartRate(int heartRate)
+{
+    if (heartRate < 60 )
+    {
+        std::cout << "Heart Rate: BRADYCARDIA\n";
+    }
+    else if (heartRate >100)
+    {
+        std::cout << "Heart Rate: TACHYCARDIA\n";
+    }
+    else
+    {
+        std::cout << "Heart Rate: NORMOCARDIA";
+    }
+}
+
+
 int main()
 {
     
-    //cout << "Hello"; //Test
-
     // Start Program→ Ask user for values → Call
     // Functions → Display Results → End Program
 
@@ -16,10 +32,7 @@ int main()
     std::cout <<"Enter Heart Rate: ";
     std::cin >> heartRate;
 
-    std::cout << "Heart Rate entered: "
-            << heartRate
-            << " bpm\n";
-            
-
+    checkHeartRate(heartRate);
+    
     return 0;
 }
