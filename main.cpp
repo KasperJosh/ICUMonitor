@@ -36,13 +36,13 @@ int main()
     cout << "\n";
 
     
-    checkBP(systolicBP, diastolicBP);
-    double map = calculateMAP(systolicBP, diastolicBP);
+    ICU::checkBP(systolicBP, diastolicBP);
+    double map = ICU::calculateMAP(systolicBP, diastolicBP);
     std::cout << "MAP: " << map << '\n';
     
-    checkHeartRate(heartRate);
-    checkSpO2(spo2);
-    checkRespRate(respRate);
+    ICU::checkHeartRate(heartRate);
+    ICU::checkSpO2(spo2);
+    ICU::checkRespRate(respRate);
     
     
 
