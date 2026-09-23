@@ -6,7 +6,29 @@ namespace
 {
     const int NORMAL_HR_LOW = 60;
     const int NORMAL_HR_HIGH = 100;
+
+    const int MIN_VALID_SPO2 = 0;
+    const int NORMAL_SPO2_LOW = 88;
+    const int MAX_VALID_SPO2 = 100;
+
+    const int LOW_SYSTOLIC = 90;
+    const int LOW_DIASTOLIC = 60;
+
+    const int STAGE1_SYS = 130;
+    const int STAGE1_DIA = 80;
+
+    const int STAGE2_SYS = 140;
+    const int STAGE2_DIA = 90;
+
+    const int SEVERE_SYS = 180;
+    const int SEVERE_DIA = 120;
+
+    const int ELEVATED_SYS = 120;
+
+    const int NORMAL_RR_LOW = 12;
+    const int NORMAL_RR_HIGH = 20;
 }
+
 
 
 namespace ICU{
@@ -28,30 +50,33 @@ namespace ICU{
 
     void checkSpO2 (int spo2)
     {
-        if (spo2 < 88)
+        if (spo2 < NORMAL_SPO2_LOW && spo2 >= MIN_VALID_SPO2 )
         {
-            std::cout << "SpO2: DESATURAION\n";
+            std::cout << "SpO2: DESATURATION\n";
         }
-        else if (spo2 >= 88 && spo2 <= 100) {
+        else if (spo2 >= NORMAL_SPO2_LOW  && spo2 <= MAX_VALID_SPO2) {
             std::cout << "SpO2: NORMAL SATURATION\n";
+        }
+        else{
+            std::cout << "Invalid SpO2\n";
         }
     }
 
     void checkBP (int systolicBP, int diastolicBP)
     {
-        if (systolicBP < 90 || diastolicBP < 60){
+        if (systolicBP < LOW_SYSTOLIC || diastolicBP  < LOW_DIASTOLIC){
             std::cout << "Blood Pressure: Low blood pressure\n";
         } 
-        else if (systolicBP > 180 || diastolicBP > 120){
+        else if (systolicBP > SEVERE_SYS || diastolicBP > SEVERE_DIA){
             std::cout << "Blood Pressure: Severe hypertension\n";
         }
-        else if (systolicBP >= 140 || diastolicBP >= 90){
+        else if (systolicBP >= STAGE2_SYS || diastolicBP >= STAGE2_DIA){
             std::cout << "Blood Pressure: Stage 2 hypertension\n";
         }
-        else if (systolicBP >= 130 || diastolicBP >= 80){
+        else if (systolicBP >= STAGE1_SYS || diastolicBP >= STAGE1_DIA){
             std::cout << "Blood Pressure: Stage 1 hypertension\n";
         }    
-        else if (systolicBP >= 120){
+        else if (systolicBP >= ELEVATED_SYS ){
             std::cout << "Blood Pressure: Elevated\n";
         } 
         else{
@@ -61,11 +86,11 @@ namespace ICU{
 
     void checkRespRate(int respRate){
 
-        if (respRate < 12 )
+        if (respRate < NORMAL_RR_LOW  )
         {
             std::cout << "Respiratory Rate: BRADYPNEA\n";
         }
-        else if (respRate < 20 )
+        else if (respRate > NORMAL_RR_HIGH )
         {
             std::cout << "Respiratory Rate: TACHYPNEA\n";
         }

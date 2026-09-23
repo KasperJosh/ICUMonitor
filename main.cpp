@@ -38,7 +38,7 @@ int main()
     
     ICU::checkBP(systolicBP, diastolicBP);
     double map = ICU::calculateMAP(systolicBP, diastolicBP);
-    std::cout << "MAP: " << map << '\n';
+    cout << "MAP: " << map << '\n';
     
     ICU::checkHeartRate(heartRate);
     ICU::checkSpO2(spo2);

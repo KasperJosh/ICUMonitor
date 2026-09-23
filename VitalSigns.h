@@ -1,5 +1,5 @@
-#ifndef VITALSIGNS_h
-#define VITALSIGNS_h
+#ifndef VITALSIGNS_H
+#define VITALSIGNS_H
 
 namespace ICU{
     void checkHeartRate (int heartRate);
