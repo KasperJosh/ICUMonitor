@@ -1,14 +1,22 @@
 #include <iostream>  
 #include "VitalSigns.h"
 
+//private implementation detail of this .cpp file
+namespace
+{
+    const int NORMAL_HR_LOW = 60;
+    const int NORMAL_HR_HIGH = 100;
+}
+
+
 namespace ICU{
     void checkHeartRate(int heartRate)
     {
-        if (heartRate < 60 )
+        if (heartRate < NORMAL_HR_LOW )
         {
             std::cout << "Heart Rate: BRADYCARDIA\n";
         }
-        else if (heartRate >100)
+        else if (heartRate > NORMAL_HR_HIGH)
         {
             std::cout << "Heart Rate: TACHYCARDIA\n";
         }
