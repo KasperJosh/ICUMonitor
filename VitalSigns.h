@@ -13,6 +13,12 @@ namespace ICU{
     int calculatePulsePressure ( int systolicBP, int diastolicBP);
     double calculateShockIndex (int heartRate, int systolicBP);
 
+    //Validation
+    bool isValidHeartRate(int heartRate);
+    bool isValidSpO2 (int spo2);
+    bool isValidBloodPressure( int systolicBP, int diastolicBP);
+    bool isValidRR (int rr);
+    bool isValidTemp (double temp);
 
     void displayVitalSigns(
         int heartRate, 

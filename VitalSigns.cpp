@@ -62,9 +62,6 @@ namespace ICU{
         else if (spo2 >= NORMAL_SPO2_LOW  && spo2 <= MAX_VALID_SPO2) {
             std::cout << std::setw(20) << "SpO2: " << "NORMAL\n";
         }
-        else{
-            std::cout << std::setw(20) << "SpO2: " << "Invalid SpO2\n";
-        }
     }
 
     void checkBP (int systolicBP, int diastolicBP)
@@ -133,6 +130,27 @@ namespace ICU{
     double calculateShockIndex (int heartRate, int systolicBP){
         return static_cast<double>(heartRate)/ systolicBP;
     }
+
+    // Adding some input validations
+    bool isValidHeartRate(int heartRate){
+        return heartRate >0 && heartRate < 300;
+    }
+    bool isValidSpO2 (int spo2){
+        return spo2 >0 && spo2 <=100;
+    }
+    bool isValidBloodPressure (int systolicBP, int diastolicBP){
+        return (systolicBP >0 && systolicBP < 300) && (diastolicBP >0 && diastolicBP < 300);
+    }
+    bool isValidRR (int rr){
+        return rr >0 && rr <=50;
+    }
+    bool isValidTemp(double temp){
+        return temp >20.0 && temp < 45.0;
+    }
+
+
+
+
 
 
     void displayVitalSigns(
