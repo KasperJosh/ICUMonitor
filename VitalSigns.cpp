@@ -172,6 +172,85 @@ namespace ICU{
         std::cout << std::setw(15) << "Temp " << temperature << " Celcius\n";
     }
 
+// Defining the default constructor
+ICU::VitalSigns::VitalSigns()
+{
+    heartRate = 0;
+    spo2 = 0;
+    systolicBP = 0;
+    diastolicBP = 0;
+    respRate = 0;
+    temperature = 0.0;
+}
+
+// Implementing the parameterized constructor
+ICU::VitalSigns::VitalSigns(
+    int heartRate,
+    int spo2,
+    int systolicBP,
+    int diastolicBP,
+    int respRate,
+    double temperature)
+{
+    this->heartRate = heartRate;
+    this->spo2 = spo2;
+    this->systolicBP = systolicBP;
+    this->diastolicBP = diastolicBP;
+    this->respRate = respRate;
+    this->temperature = temperature;
+}
+
+// Getters -----------------------------------------
+int ICU::VitalSigns::getHeartRate() const
+{
+    return heartRate;
+}
+
+int ICU::VitalSigns::getSpO2() const
+{
+    return spo2;
+}
+
+int ICU::VitalSigns::getSystolicBP() const
+{
+    return systolicBP;
+}
+
+int ICU::VitalSigns::getDiastolicBP() const
+{
+    return diastolicBP;
+}
+
+int ICU::VitalSigns::getRespRate() const
+{
+    return respRate;
+}
+
+double ICU::VitalSigns::getTemperature() const
+{
+    return temperature;
+}
+
+
+// Setters --------------------------------------------------
+void ICU::VitalSigns::setHeartRate(int heartRate){
+    this->heartRate =heartRate;
+}
+void ICU::VitalSigns::setSpO2(int spo2){
+    this->spo2=spo2;
+}
+void ICU::VitalSigns::setSystolicBP(int systolicBP){
+    this->systolicBP = systolicBP;
+}
+void ICU::VitalSigns::setDiastolicBP(int diastolicBP){
+    this->diastolicBP = diastolicBP;
+}
+void ICU::VitalSigns::setRespRate(int respRate){
+    this->respRate = respRate;
+};
+void ICU::VitalSigns::setTemperature(double temperature){
+    this->temperature = temperature;
+};
 
 }
 

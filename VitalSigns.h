@@ -3,6 +3,39 @@
 
 namespace ICU{
     
+    class VitalSigns{
+        private: 
+            int heartRate;
+            int spo2;
+            int systolicBP;
+            int diastolicBP;
+            int respRate;
+            double temperature;
+
+        public:
+
+            //Default constructor
+            VitalSigns();
+            // Parameter constructor
+            VitalSigns(int heartRate, int spo2, int systolicBP, int diastolicBP, int respRate, double temperature);
+
+            int getHeartRate() const;
+            int getSpO2() const;
+            int getSystolicBP() const;
+            int getDiastolicBP() const;
+            int getRespRate() const;
+            double getTemperature() const;
+
+            void setHeartRate(int heartRate);
+            void setSpO2(int spo2);
+            void setSystolicBP(int systolicBP);
+            void setDiastolicBP(int diastolicBP);
+            void setRespRate(int respRate);
+            void setTemperature(double temperature);
+    
+        }; 
+
+
     void checkHeartRate (int heartRate);
     void checkSpO2 (int spo2);
     void checkBP (int systolicBP, int diastolicBP);
