@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include "VitalSigns.h"
 
 
@@ -15,7 +16,6 @@ int main()
     int respRate;
     double temperature;
 
-    // Since we're using the namespace std, we don't need std::
     std::cout <<"========ICU PATIENT Monitor ========\n";
     std::cout <<"Enter Systolic Blood Pressure: ";
     std::cin >> systolicBP;
@@ -38,15 +38,25 @@ int main()
     std::cout << "\n";
 
     
+    std::cout << "===== Assessment ===== \n";
+    std::cout << std::left;
     ICU::checkBP(systolicBP, diastolicBP);
     double map = ICU::calculateMAP(systolicBP, diastolicBP);
-    std::cout << "MAP: " << map << '\n';
+    std::cout <<std::setw(20)<< "MAP: " << map << '\n';
     
     ICU::checkHeartRate(heartRate);
     ICU::checkSpO2(spo2);
     ICU::checkRespRate(respRate);
     ICU::checkTemperature(temperature);
     
+    int pulsePressure = ICU::calculatePulsePressure(systolicBP, diastolicBP);
+    double shockIndex = ICU::calculateShockIndex(heartRate, systolicBP);
+
+    std::cout << std::setw(20) <<"Pulse Pressure: " << pulsePressure <<  " mmHg\n";
+    std::cout << std::setw(20) << "Shock Index: " << shockIndex << '\n'; 
+
+
+
     ICU::displayVitalSigns (heartRate, spo2, systolicBP, diastolicBP, respRate, temperature);
 
 

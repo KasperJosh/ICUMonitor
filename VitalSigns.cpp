@@ -1,4 +1,5 @@
 #include <iostream>  
+#include <iomanip> 
 #include "VitalSigns.h"
 
 //private implementation detail of this .cpp file
@@ -40,15 +41,15 @@ namespace ICU{
     {
         if (heartRate < NORMAL_HR_LOW )
         {
-            std::cout << "Heart Rate: BRADYCARDIA\n";
+            std::cout << std::setw(20) <<  "Heart Rate: " << "BRADYCARDIA\n";
         }
         else if (heartRate > NORMAL_HR_HIGH)
         {
-            std::cout << "Heart Rate: TACHYCARDIA\n";
+            std::cout << std::setw(20) <<  "Heart Rate: " << "TACHYCARDIA\n";
         }
         else
         {
-            std::cout << "Heart Rate: NORMOCARDIA\n";
+            std::cout << std::setw(20) <<  "Heart Rate: " << "NORMAL\n";
         }
     }
 
@@ -56,35 +57,35 @@ namespace ICU{
     {
         if (spo2 < NORMAL_SPO2_LOW && spo2 >= MIN_VALID_SPO2 )
         {
-            std::cout << "SpO2: DESATURATION\n";
+            std::cout << std::setw(20) << "SpO2: " << "DESATURATION\n";
         }
         else if (spo2 >= NORMAL_SPO2_LOW  && spo2 <= MAX_VALID_SPO2) {
-            std::cout << "SpO2: NORMAL SATURATION\n";
+            std::cout << std::setw(20) << "SpO2: " << "NORMAL\n";
         }
         else{
-            std::cout << "Invalid SpO2\n";
+            std::cout << std::setw(20) << "SpO2: " << "Invalid SpO2\n";
         }
     }
 
     void checkBP (int systolicBP, int diastolicBP)
     {
         if (systolicBP < LOW_SYSTOLIC || diastolicBP  < LOW_DIASTOLIC){
-            std::cout << "Blood Pressure: Low blood pressure\n";
+            std::cout << std::setw(20) << "Blood Pressure: " << "Low blood pressure\n";
         } 
         else if (systolicBP > SEVERE_SYS || diastolicBP > SEVERE_DIA){
-            std::cout << "Blood Pressure: Severe hypertension\n";
+            std::cout << std::setw(20) << "Blood Pressure: " << "Severe hypertension\n";
         }
         else if (systolicBP >= STAGE2_SYS || diastolicBP >= STAGE2_DIA){
-            std::cout << "Blood Pressure: Stage 2 hypertension\n";
+            std::cout << std::setw(20) << "Blood Pressure: " << "Stage 2 hypertension\n";
         }
         else if (systolicBP >= STAGE1_SYS || diastolicBP >= STAGE1_DIA){
-            std::cout << "Blood Pressure: Stage 1 hypertension\n";
+            std::cout << std::setw(20) << "Blood Pressure: " << "Stage 1 hypertension\n";
         }    
         else if (systolicBP >= ELEVATED_SYS ){
-            std::cout << "Blood Pressure: Elevated\n";
+            std::cout << std::setw(20) << "Blood Pressure: " << "Elevated\n";
         } 
         else{
-            std::cout << "Blood Pressure: Normal\n";
+            std::cout << std::setw(20) << "Blood Pressure: " << "Normal\n";
         }
     }
 
@@ -92,39 +93,39 @@ namespace ICU{
 
         if (respRate < NORMAL_RR_LOW  )
         {
-            std::cout << "Respiratory Rate: BRADYPNEA\n";
+            std::cout << std::setw(20) << "Respiratory Rate: " << "BRADYPNEA\n";
         }
         else if (respRate > NORMAL_RR_HIGH )
         {
-            std::cout << "Respiratory Rate: TACHYPNEA\n";
+            std::cout << std::setw(20) << "Respiratory Rate: " << "TACHYPNEA\n";
         }
         else
         {
-            std::cout << "Respiratory Rate: EUPNEIC\n";
+            std::cout << std::setw(20) << "Respiratory Rate: " << "EUPNEIC\n";
         }
     }
 
 
     void checkTemperature (double temperature) {
         if (temperature < NORMAL_TEMP_LOW ){
-            std::cout << "Temperature: HYPOTHERMIA\n";
+            std::cout << std::setw(20) << "Temperature: " << "HYPOTHERMIA\n";
         }
         else if (temperature > NORMAL_TEMP_HIGH){
-            std::cout << "Temperature: HYPERTHERMIA\n";
+            std::cout << std::setw(20) << "Temperature: " << "HYPERTHERMIA\n";
         }
 
         else {
-            std::cout << "Temperature: NORMOTHERMIA\n";
+            std::cout << std::setw(20) << "Temperature: " << "NORMAL\n";
         }
     }
 
 
     double calculateMAP(int systolicBP, int diastolicBP)
     {
-        return static_cast<double> (systolicBP + 2.0*diastolicBP) / 3.0;
+        return (systolicBP + 2.0*diastolicBP) / 3.0;
     }
 
-    double calculatePulsePressure (int systolicBP, int diastolicBP)
+    int calculatePulsePressure (int systolicBP, int diastolicBP)
     {
         return systolicBP - diastolicBP;
     }
@@ -144,12 +145,13 @@ namespace ICU{
     {
         std::cout << "\n==== ICU Monitor ====\n";
         
-        std::cout << "HR: " << heartRate << " bpm\n";
-        std::cout << "SpO2: " << spo2 << " %\n";
-        std::cout << "BP: " << systolicBP << "/" << diastolicBP << " mmHg\n";
-        std::cout << "MAP: " << calculateMAP(systolicBP, diastolicBP) << "\n";
-        std::cout << "RR: " << respRate << " /min\n";
-        std:: cout << "Temp " << temperature << " °C\n";
+        std::cout << std::left;
+        std::cout << std::setw(15) << "HR: " << heartRate << " bpm\n";
+        std::cout << std::setw(15) << "SpO2: " << spo2 << " %\n";
+        std::cout << std::setw(15) << "BP: " << systolicBP << "/" << diastolicBP << " mmHg\n";
+        std::cout << std::setw(15) << "MAP: " << calculateMAP(systolicBP, diastolicBP) << "\n";
+        std::cout << std::setw(15) << "RR: " << respRate << " /min\n";
+        std::cout << std::setw(15) << "Temp " << temperature << " Celcius\n";
     }
 
 

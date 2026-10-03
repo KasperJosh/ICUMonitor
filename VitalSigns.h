@@ -10,7 +10,7 @@ namespace ICU{
     void checkTemperature ( double temperature);
     double calculateMAP(int systolicBP, int diastolicBP);
     
-    double calculatePulsePressure ( int systolicBP, int diastolicBP);
+    int calculatePulsePressure ( int systolicBP, int diastolicBP);
     double calculateShockIndex (int heartRate, int systolicBP);
 
 
