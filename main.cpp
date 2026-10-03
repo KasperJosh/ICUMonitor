@@ -8,9 +8,14 @@ int main()
     
     // Start Program→ Ask user for values → Call
     // Functions → Display Results → End Program
-    ICU::VitalSigns patientVitals;
+    //ICU::VitalSigns patientVitals;
 
-    return 0;
+    // Parameterized
+    ICU::VitalSigns patientVitals(80,90,120,80,16,37.0);
+    // Cannott do std::cout <<patientVitals.heartRate; (private)
+    patientVitals.displayVitalSigns();
+    
+    //------------
     int systolicBP{};
     int diastolicBP{};
     int heartRate{};
@@ -52,6 +57,13 @@ int main()
             std::cout <<"Enter Temperature: ";
             std::cin >> temperature;
 
+
+            patientVitals.setSystolicBP(systolicBP);
+            patientVitals.setDiastolicBP(diastolicBP);
+            patientVitals.setHeartRate(heartRate);
+            patientVitals.setSpO2(spo2);
+            patientVitals.setRespRate(respRate);
+            patientVitals.setTemperature(temperature);
             std::cout << "\n";
 
             vitalsEntered = true;
@@ -59,7 +71,7 @@ int main()
 
         else if (choice ==2) {
             if (vitalsEntered){
-                ICU::displayVitalSigns (heartRate, spo2, systolicBP, diastolicBP, respRate, temperature);
+                patientVitals.displayVitalSigns();
             }
             else {
                 std::cout <<"Please enter Vital Signs first. \n";
@@ -74,24 +86,24 @@ int main()
                 std::cout << std::left;
                 
                 // Blood Pressure Validation
-                if (ICU::isValidBloodPressure(systolicBP, diastolicBP)){
-                    ICU::checkBP(systolicBP,diastolicBP);
+                if (patientVitals.isValidBloodPressure()){
+                    patientVitals.checkBP();
                 }
                 else {
                     std::cout <<"Invalid Blood Pressure\n";
                 }
                 
                 // Heart Rate Validation
-                if (ICU::isValidHeartRate(heartRate)){
-                    ICU::checkHeartRate(heartRate);
+                if (patientVitals.isValidHeartRate()){
+                    patientVitals.checkHeartRate();
                 }
                 else{
                     std::cout << "Invalid Heart Rate\n";
                 }
                 
                 // SpO2 Validation 
-                if (ICU::isValidSpO2(spo2)){
-                    ICU::checkSpO2(spo2);
+                if (patientVitals.isValidSpO2()){
+                    patientVitals.checkSpO2();
                 }
                 else {
                     std::cout << "Invalid SpO2\n";
@@ -99,16 +111,16 @@ int main()
 
                 
                 // RR Validation
-                if (ICU::isValidRR(respRate)){
-                    ICU::checkRespRate(respRate);
+                if (patientVitals.isValidRR()){
+                    patientVitals.checkRespRate();
                 }
                 else{
                     std::cout << "Invalid Respiratory Rate \n";
                 }
                 
                 // Temperature Validation
-                if (ICU::isValidTemp(temperature)){
-                    ICU::checkTemperature(temperature);
+                if (patientVitals.isValidTemp()){
+                    patientVitals.checkTemperature();
                 }
                 else {
                     std::cout <<"Invalid Temperature\n";
@@ -127,11 +139,11 @@ int main()
                 std::cout << "\n===== Calculations =====\n";
 
                 std::cout << std::left;
-                std::cout << std::setw(20) <<  "MAP: "<< ICU::calculateMAP(systolicBP, diastolicBP) << '\n';
+                std::cout << std::setw(20) <<  "MAP: "<< patientVitals.calculateMAP() << '\n';
 
-                std::cout << std::setw(20) << "Pulse Pressure: " << ICU::calculatePulsePressure(systolicBP,diastolicBP)<< " mmHg\n";
+                std::cout << std::setw(20) << "Pulse Pressure: " << patientVitals.calculatePulsePressure()<< " mmHg\n";
 
-                std::cout << std::setw(20) << "Shock Index: "<< ICU::calculateShockIndex(heartRate,systolicBP)<< '\n';
+                std::cout << std::setw(20) << "Shock Index: "<< patientVitals.calculateShockIndex()<< '\n';
             }
             else {
                 std::cout <<"Please enter Vital Signs first. \n";

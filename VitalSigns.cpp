@@ -37,7 +37,7 @@ namespace
 
 
 namespace ICU{
-    void checkHeartRate(int heartRate)
+    void ICU::VitalSigns::checkHeartRate() const
     {
         if (heartRate < NORMAL_HR_LOW )
         {
@@ -53,7 +53,7 @@ namespace ICU{
         }
     }
 
-    void checkSpO2 (int spo2)
+    void ICU::VitalSigns::checkSpO2() const
     {
         if (spo2 < NORMAL_SPO2_LOW && spo2 >= MIN_VALID_SPO2 )
         {
@@ -64,7 +64,7 @@ namespace ICU{
         }
     }
 
-    void checkBP (int systolicBP, int diastolicBP)
+    void ICU::VitalSigns::checkBP() const
     {
         if (systolicBP < LOW_SYSTOLIC || diastolicBP  < LOW_DIASTOLIC){
             std::cout << std::setw(20) << "Blood Pressure: " << "Low blood pressure\n";
@@ -86,7 +86,7 @@ namespace ICU{
         }
     }
 
-    void checkRespRate(int respRate){
+    void ICU::VitalSigns::checkRespRate() const{
 
         if (respRate < NORMAL_RR_LOW  )
         {
@@ -103,7 +103,7 @@ namespace ICU{
     }
 
 
-    void checkTemperature (double temperature) {
+    void ICU::VitalSigns::checkTemperature() const {
         if (temperature < NORMAL_TEMP_LOW ){
             std::cout << std::setw(20) << "Temperature: " << "HYPOTHERMIA\n";
         }
@@ -117,49 +117,45 @@ namespace ICU{
     }
 
 
-    double calculateMAP(int systolicBP, int diastolicBP)
+    double ICU::VitalSigns::calculateMAP() const
     {
         return (systolicBP + 2.0*diastolicBP) / 3.0;
     }
 
-    int calculatePulsePressure (int systolicBP, int diastolicBP)
+    int ICU::VitalSigns::calculatePulsePressure() const
     {
         return systolicBP - diastolicBP;
     }
 
-    double calculateShockIndex (int heartRate, int systolicBP){
-        return static_cast<double>(heartRate)/ systolicBP;
+    double ICU::VitalSigns::calculateShockIndex () const
+    {
+        if (systolicBP == 0)
+        {
+            return 0.0;
+        }
+
+        return static_cast<double>(heartRate) / systolicBP;
     }
 
     // Adding some input validations
-    bool isValidHeartRate(int heartRate){
+    bool ICU::VitalSigns::isValidHeartRate() const{
         return heartRate >0 && heartRate < 300;
     }
-    bool isValidSpO2 (int spo2){
+    bool ICU::VitalSigns::isValidSpO2() const{
         return spo2 >0 && spo2 <=100;
     }
-    bool isValidBloodPressure (int systolicBP, int diastolicBP){
+    bool ICU::VitalSigns::isValidBloodPressure () const{
         return (systolicBP >0 && systolicBP < 300) && (diastolicBP >0 && diastolicBP < 300);
     }
-    bool isValidRR (int rr){
-        return rr >0 && rr <=50;
+    bool ICU::VitalSigns::isValidRR() const{
+        return respRate >0 && respRate <=50;
     }
-    bool isValidTemp(double temp){
-        return temp >20.0 && temp < 45.0;
+    bool ICU::VitalSigns::isValidTemp() const{
+        return temperature >20.0 && temperature < 45.0;
     }
 
 
-
-
-
-
-    void displayVitalSigns(
-        int heartRate, 
-        int spo2, 
-        int systolicBP, 
-        int diastolicBP, 
-        int respRate, 
-        double temperature)
+    void ICU::VitalSigns::displayVitalSigns() const
     {
         std::cout << "\n==== ICU Monitor ====\n";
         
@@ -167,7 +163,7 @@ namespace ICU{
         std::cout << std::setw(15) << "HR: " << heartRate << " bpm\n";
         std::cout << std::setw(15) << "SpO2: " << spo2 << " %\n";
         std::cout << std::setw(15) << "BP: " << systolicBP << "/" << diastolicBP << " mmHg\n";
-        std::cout << std::setw(15) << "MAP: " << calculateMAP(systolicBP, diastolicBP) << "\n";
+        std::cout << std::setw(15) << "MAP: " << calculateMAP() << "\n";
         std::cout << std::setw(15) << "RR: " << respRate << " /min\n";
         std::cout << std::setw(15) << "Temp " << temperature << " Celcius\n";
     }
@@ -247,10 +243,10 @@ void ICU::VitalSigns::setDiastolicBP(int diastolicBP){
 }
 void ICU::VitalSigns::setRespRate(int respRate){
     this->respRate = respRate;
-};
+}
 void ICU::VitalSigns::setTemperature(double temperature){
     this->temperature = temperature;
-};
+}
 
 }
 
