@@ -27,6 +27,10 @@ namespace
 
     const int NORMAL_RR_LOW = 12;
     const int NORMAL_RR_HIGH = 20;
+
+    const int NORMAL_TEMP_LOW = 36.0;
+    const int NORMAL_TEMP_HIGH = 38.0;
+
 }
 
 
@@ -101,10 +105,55 @@ namespace ICU{
     }
 
 
+    void checkTemperature (double temperature) {
+        if (temperature < NORMAL_TEMP_LOW ){
+            std::cout << "Temperature: HYPOTHERMIA\n";
+        }
+        else if (temperature > NORMAL_TEMP_HIGH){
+            std::cout << "Temperature: HYPERTHERMIA\n";
+        }
+
+        else {
+            std::cout << "Temperature: NORMOTHERMIA\n";
+        }
+    }
+
+
+
+
     double calculateMAP(int systolicBP, int diastolicBP)
     {
         return (systolicBP + 2.0*diastolicBP) / 3.0;
     }
+
+    double calculatePulsePressure (int systolicBP, int diastolicBP)
+    {
+        return systolicBP - diastolicBP;
+    }
+
+    double calculateShockIndex (int heartRate, int systolicBP){
+        return heartRate/ systolicBP;
+    }
+
+
+    void displayVitalSigns(
+        int heartRate, 
+        int spo2, 
+        int systolicBP, 
+        int diastolicBP, 
+        int respRate, 
+        double temperature)
+    {
+        std::cout << "\n==== ICU Monitor ====\n";
+        
+        std::cout << "HR: " << heartRate << "bpm\n";
+        std::cout << "SpO2: " << spo2 << "%\n";
+        std::cout << "BP: " << systolicBP << "/" << diastolicBP << " mmHg\n";
+        std::cout << "MAP: " << calculateMAP(systolicBP, diastolicBP) << "\n";
+        std::cout << "RR: " << respRate << "\nmin\n";
+        std:: cout << "Temp " << temperature << "°C\n";
+    }
+
 
 }
 

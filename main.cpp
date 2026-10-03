@@ -1,6 +1,5 @@
 #include <iostream>
 #include "VitalSigns.h"
-using namespace std;
 
 
 int main()
@@ -9,42 +8,47 @@ int main()
     // Start Program→ Ask user for values → Call
     // Functions → Display Results → End Program
 
-    // Asking for the heart rate
     int systolicBP;
     int diastolicBP;
     int heartRate;
     int spo2;
     int respRate;
+    double temperature;
 
     // Since we're using the namespace std, we don't need std::
-    cout <<"========ICU PATIENT Monitor ========\n";
-    cout <<"Enter Systolic Blood Pressure: ";
-    cin >> systolicBP;
+    std::cout <<"========ICU PATIENT Monitor ========\n";
+    std::cout <<"Enter Systolic Blood Pressure: ";
+    std::cin >> systolicBP;
 
-    cout <<"Enter Diastolic Blood Pressure: ";
-    cin >> diastolicBP;
+    std::cout <<"Enter Diastolic Blood Pressure: ";
+    std::cin >> diastolicBP;
 
-    cout <<"Enter Heart Rate: ";
-    cin >> heartRate;
+    std::cout <<"Enter Heart Rate: ";
+    std::cin >> heartRate;
 
-    cout <<"Enter SpO2: ";
-    cin >> spo2;
+    std::cout <<"Enter SpO2: ";
+    std::cin >> spo2;
 
-    cout <<"Enter Respiratory Rate : ";
-    cin >> respRate;
+    std::cout <<"Enter Respiratory Rate : ";
+    std::cin >> respRate;
 
-    cout << "\n";
+    std::cout <<"Enter Temperature: ";
+    std::cin >> temperature;
+
+    std::cout << "\n";
 
     
     ICU::checkBP(systolicBP, diastolicBP);
     double map = ICU::calculateMAP(systolicBP, diastolicBP);
-    cout << "MAP: " << map << '\n';
+    std::cout << "MAP: " << map << '\n';
     
     ICU::checkHeartRate(heartRate);
     ICU::checkSpO2(spo2);
     ICU::checkRespRate(respRate);
+    ICU::checkTemperature(temperature);
     
-    
+    ICU::displayVitalSigns (heartRate, spo2, systolicBP, diastolicBP, respRate, temperature);
+
 
     return 0;
 }
