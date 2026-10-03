@@ -60,10 +60,10 @@ int main()
             std::cout << "===== Assessment ===== \n";
             std::cout << std::left;
             
-            ICU::checkBP(systolicBP, diastolicBP);
-            double map = ICU::calculateMAP(systolicBP, diastolicBP);
-            
-            std::cout <<std::setw(20)<< "MAP: " << map << '\n';
+            // Blood Pressure Validation
+            if (ICU::isValidBloodPressure(systolicBP, diastolicBP)){
+                ICU::checkBP(systolicBP,diastolicBP);
+            }
             
             // Heart Rate Validation
             if (ICU::isValidHeartRate(heartRate)){
@@ -81,10 +81,6 @@ int main()
                 std::cout << "Invalid SpO2\n";
             }
 
-            // Blood Pressure Validation
-            if (ICU::isValidBloodPressure(systolicBP, diastolicBP)){
-                ICU::checkBP(systolicBP,diastolicBP);
-            }
             
             // RR Validation
             if (ICU::isValidRR(respRate)){
@@ -110,28 +106,16 @@ int main()
         {
             std::cout <<"Exiting ICU Monitor...\n";
         }
-        
+
         else if (choice == 4)
         {
             std::cout << "\n===== Calculations =====\n";
 
-            std::cout << "MAP: "
-                      << ICU::calculateMAP(
-                             systolicBP,
-                             diastolicBP)
-                      << '\n';
+            std::cout << std::setw(20) <<  "MAP: "<< ICU::calculateMAP(systolicBP, diastolicBP) << '\n';
 
-            std::cout << "Pulse Pressure: "
-                      << ICU::calculatePulsePressure(
-                             systolicBP,
-                             diastolicBP)
-                      << " mmHg\n";
+            std::cout << std::setw(20) << "Pulse Pressure: " << ICU::calculatePulsePressure(systolicBP,diastolicBP)<< " mmHg\n";
 
-            std::cout << "Shock Index: "
-                      << ICU::calculateShockIndex(
-                             heartRate,
-                             systolicBP)
-                      << '\n';
+            std::cout << std::setw(20) << "Shock Index: "<< ICU::calculateShockIndex(heartRate,systolicBP)<< '\n';
         }
 
         else 
