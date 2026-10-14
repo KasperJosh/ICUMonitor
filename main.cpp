@@ -33,7 +33,8 @@ int main()
         std::cout << "2. Display Vital Signs\n";
         std::cout << "3. Display Assessment\n";
         std::cout << "4. Display Calculations\n";
-        std::cout << "5. Exit\n";
+        std::cout << "5. Display Heart Rate History\n";
+        std::cout << "6. Exit\n";
         std::cout << "Choice: ";
         std::cin >> choice;
     
@@ -61,6 +62,7 @@ int main()
             patientVitals.setSystolicBP(systolicBP);
             patientVitals.setDiastolicBP(diastolicBP);
             patientVitals.setHeartRate(heartRate);
+            patientVitals.addHeartRateReading(heartRate);
             patientVitals.setSpO2(spo2);
             patientVitals.setRespRate(respRate);
             patientVitals.setTemperature(temperature);
@@ -150,7 +152,22 @@ int main()
             }
         }
 
-        else if (choice ==5)
+
+        else if (choice == 5)
+        {
+            patientVitals.displayHeartRateHistory();
+
+            std::cout << "Average HR: "
+                    << patientVitals.calculateAverageHeartRate()
+                    << " bpm\n";
+        }
+
+        else if (choice == 6)
+        {
+            std::cout << "Exiting ICU Monitor...\n";
+        }
+
+        else if (choice ==6)
         {
             std::cout <<"Exiting ICU Monitor...\n";
         }
@@ -160,7 +177,7 @@ int main()
             std::cout <<"Invalid menu option.\n";
         }
 
-    } while(choice !=5);
+    } while(choice !=6);
 
     return 0;
 }
