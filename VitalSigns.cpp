@@ -37,7 +37,7 @@ namespace
 
 
 namespace ICU{
-    void ICU::VitalSigns::checkHeartRate() const
+    void VitalSigns::checkHeartRate() const
     {
         if (heartRate < NORMAL_HR_LOW )
         {
@@ -53,7 +53,7 @@ namespace ICU{
         }
     }
 
-    void ICU::VitalSigns::checkSpO2() const
+    void VitalSigns::checkSpO2() const
     {
         if (spo2 < NORMAL_SPO2_LOW && spo2 >= MIN_VALID_SPO2 )
         {
@@ -64,7 +64,7 @@ namespace ICU{
         }
     }
 
-    void ICU::VitalSigns::checkBP() const
+    void VitalSigns::checkBP() const
     {
         if (systolicBP < LOW_SYSTOLIC || diastolicBP  < LOW_DIASTOLIC){
             std::cout << std::setw(20) << "Blood Pressure: " << "Low blood pressure\n";
@@ -86,7 +86,7 @@ namespace ICU{
         }
     }
 
-    void ICU::VitalSigns::checkRespRate() const{
+    void VitalSigns::checkRespRate() const{
 
         if (respRate < NORMAL_RR_LOW  )
         {
@@ -103,7 +103,7 @@ namespace ICU{
     }
 
 
-    void ICU::VitalSigns::checkTemperature() const {
+    void VitalSigns::checkTemperature() const {
         if (temperature < NORMAL_TEMP_LOW ){
             std::cout << std::setw(20) << "Temperature: " << "HYPOTHERMIA\n";
         }
@@ -117,17 +117,17 @@ namespace ICU{
     }
 
 
-    double ICU::VitalSigns::calculateMAP() const
+    double VitalSigns::calculateMAP() const
     {
         return (systolicBP + 2.0*diastolicBP) / 3.0;
     }
 
-    int ICU::VitalSigns::calculatePulsePressure() const
+    int VitalSigns::calculatePulsePressure() const
     {
         return systolicBP - diastolicBP;
     }
 
-    double ICU::VitalSigns::calculateShockIndex () const
+    double VitalSigns::calculateShockIndex () const
     {
         if (systolicBP == 0)
         {
@@ -138,24 +138,24 @@ namespace ICU{
     }
 
     // Adding some input validations
-    bool ICU::VitalSigns::isValidHeartRate() const{
+    bool VitalSigns::isValidHeartRate() const{
         return heartRate >0 && heartRate < 300;
     }
-    bool ICU::VitalSigns::isValidSpO2() const{
+    bool VitalSigns::isValidSpO2() const{
         return spo2 >0 && spo2 <=100;
     }
-    bool ICU::VitalSigns::isValidBloodPressure () const{
+    bool VitalSigns::isValidBloodPressure () const{
         return (systolicBP >0 && systolicBP < 300) && (diastolicBP >0 && diastolicBP < 300);
     }
-    bool ICU::VitalSigns::isValidRR() const{
+    bool VitalSigns::isValidRR() const{
         return respRate >0 && respRate <=50;
     }
-    bool ICU::VitalSigns::isValidTemp() const{
+    bool VitalSigns::isValidTemp() const{
         return temperature >20.0 && temperature < 45.0;
     }
 
 
-    void ICU::VitalSigns::displayVitalSigns() const
+    void VitalSigns::displayVitalSigns() const
     {
         std::cout << "\n==== ICU Monitor ====\n";
         
@@ -169,7 +169,7 @@ namespace ICU{
     }
 
     // Defining the default constructor
-    ICU::VitalSigns::VitalSigns()
+    VitalSigns::VitalSigns()
     {
         heartRate = 0;
         spo2 = 0;
@@ -180,7 +180,7 @@ namespace ICU{
     }
 
     // Implementing the parameterized constructor
-    ICU::VitalSigns::VitalSigns(
+    VitalSigns::VitalSigns(
         int heartRate,
         int spo2,
         int systolicBP,
@@ -197,54 +197,54 @@ namespace ICU{
     }
 
     // Getters -----------------------------------------
-    int ICU::VitalSigns::getHeartRate() const
+    int VitalSigns::getHeartRate() const
     {
         return heartRate;
     }
 
-    int ICU::VitalSigns::getSpO2() const
+    int VitalSigns::getSpO2() const
     {
         return spo2;
     }
 
-    int ICU::VitalSigns::getSystolicBP() const
+    int VitalSigns::getSystolicBP() const
     {
         return systolicBP;
     }
 
-    int ICU::VitalSigns::getDiastolicBP() const
+    int VitalSigns::getDiastolicBP() const
     {
         return diastolicBP;
     }
 
-    int ICU::VitalSigns::getRespRate() const
+    int VitalSigns::getRespRate() const
     {
         return respRate;
     }
 
-    double ICU::VitalSigns::getTemperature() const
+    double VitalSigns::getTemperature() const
     {
         return temperature;
     }
 
 
     // Setters --------------------------------------------------
-    void ICU::VitalSigns::setHeartRate(int heartRate){
+    void VitalSigns::setHeartRate(int heartRate){
         this->heartRate =heartRate;
     }
-    void ICU::VitalSigns::setSpO2(int spo2){
+    void VitalSigns::setSpO2(int spo2){
         this->spo2=spo2;
     }
-    void ICU::VitalSigns::setSystolicBP(int systolicBP){
+    void VitalSigns::setSystolicBP(int systolicBP){
         this->systolicBP = systolicBP;
     }
-    void ICU::VitalSigns::setDiastolicBP(int diastolicBP){
+    void VitalSigns::setDiastolicBP(int diastolicBP){
         this->diastolicBP = diastolicBP;
     }
-    void ICU::VitalSigns::setRespRate(int respRate){
+    void VitalSigns::setRespRate(int respRate){
         this->respRate = respRate;
     }
-    void ICU::VitalSigns::setTemperature(double temperature){
+    void VitalSigns::setTemperature(double temperature){
         this->temperature = temperature;
     }
 

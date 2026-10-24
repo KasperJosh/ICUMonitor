@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include "VitalSigns.h"
+#include "Patient.h"
 
 
 int main()
@@ -10,9 +11,19 @@ int main()
     // Functions → Display Results → End Program
     //ICU::VitalSigns patientVitals;
 
-    // Parameterized
-    ICU::VitalSigns patientVitals(80,90,120,80,16,37.0);
-    // Cannott do std::cout <<patientVitals.heartRate; (private)
+    ICU::Patient patient("P001", "Patient A", 65);
+
+    ICU::VitalSigns& patientVitals = patient.getVitalSigns();
+
+    // Initialize sample measurements
+    patientVitals.setHeartRate(80);
+    patientVitals.setSpO2(90);
+    patientVitals.setSystolicBP(120);
+    patientVitals.setDiastolicBP(80);
+    patientVitals.setRespRate(16);
+    patientVitals.setTemperature(37.0);
+
+    patient.displayPatientInfo();
     patientVitals.displayVitalSigns();
     
     //------------
@@ -167,7 +178,7 @@ int main()
             std::cout << "Exiting ICU Monitor...\n";
         }
 
-        else if (choice ==6)
+        else if (choice ==7)
         {
             std::cout <<"Exiting ICU Monitor...\n";
         }
