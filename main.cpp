@@ -168,6 +168,15 @@ int main() {
     ICU::AlarmManager alarmManager;
     ICU::VitalHistory history;
 
+    const std::string filename = "vitals_P001.csv";
+
+    if (history.loadFromCSV(filename)) {
+        std::cout << "Previous history loaded.\n";
+    }
+    else {
+        std::cout << "No valid saved history found.\n";
+    }
+
     // Demonstration readings: the program begins with valid sample measurements.
     patientVitals.setHeartRate(80);
     patientVitals.setSpO2(90);
@@ -198,11 +207,18 @@ int main() {
             case 6: patient.displayPatientInfo(); break;
             case 7: displayActiveAlarms(patientVitals, alarmManager); break;
             case 8:
-                std::cout << "\nExiting ICU Monitor...\n";
+                if (history.saveToCSV(filename)) {
+                    std::cout << "Vital history saved.\n";
+                }
+                else {
+                    std::cout << "Error saving history.\n";
+                }
+
+                std::cout << "Exiting ICU Monitor...\n";
                 return 0;
-            default: std::cout << "Invalid menu option.\n";
-        }
-        if (std::cin.eof()) break;
-    }
+                        default: std::cout << "Invalid menu option.\n";
+                    }
+                    if (std::cin.eof()) break;
+                }
     return 0;
 }

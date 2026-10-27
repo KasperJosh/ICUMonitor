@@ -4,6 +4,9 @@
 #include <iomanip>
 #include <iostream>
 #include <numeric>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 namespace ICU {
 
@@ -89,4 +92,99 @@ namespace ICU {
                   << static_cast<double>(totalHR) / records.size()
                   << " bpm\n";
     }
+
+    bool VitalHistory::saveToCSV(
+        const std::string& filename) const
+    {
+        std::ofstream file(filename);
+
+        if (!file.is_open()) {
+            return false;
+        }
+
+        // Column headings
+        file << "timestamp,heartRate,spo2,"
+            << "systolicBP,diastolicBP,"
+            << "respRate,temperature\n";
+
+        // Write each stored record
+        for (const VitalRecord& record : records) {
+            file << record.timestamp << ","
+                << record.heartRate << ","
+                << record.spo2 << ","
+                << record.systolicBP << ","
+                << record.diastolicBP << ","
+                << record.respRate << ","
+                << record.temperature << "\n";
+        }
+
+        file.close();
+
+        return file.good();
+    }
+
+    
+    bool VitalHistory::loadFromCSV(
+        const std::string& filename)
+    {
+        std::ifstream file(filename);
+
+        if (!file.is_open()) {
+            return false;
+        }
+
+        std::string line;
+
+        // Skip CSV header
+        if (!std::getline(file, line)) {
+            return false;
+        }
+
+        std::vector<VitalRecord> loadedRecords;
+
+        while (std::getline(file, line)) {
+            if (line.empty()) {
+                continue;
+            }
+
+            std::stringstream ss(line);
+            VitalRecord record{};
+
+            char comma1, comma2, comma3;
+            char comma4, comma5, comma6;
+
+            if (!(ss >> record.timestamp
+                    >> comma1 >> record.heartRate
+                    >> comma2 >> record.spo2
+                    >> comma3 >> record.systolicBP
+                    >> comma4 >> record.diastolicBP
+                    >> comma5 >> record.respRate
+                    >> comma6 >> record.temperature)) {
+                return false;
+            }
+
+            if (comma1 != ',' || comma2 != ',' ||
+                comma3 != ',' || comma4 != ',' ||
+                comma5 != ',' || comma6 != ',') {
+                return false;
+            }
+
+            ss >> std::ws;
+            if (!ss.eof()) {
+                return false;
+            }
+
+            loadedRecords.push_back(record);
+        }
+
+        if (file.bad()) {
+            return false;
+        }
+
+        // Replace history only after successful parsing
+        records = std::move(loadedRecords);
+
+        return true;
+    }
+
 }
