@@ -4,6 +4,7 @@
 
 #include "Patient.h"
 #include "AlarmManager.h"
+#include "VitalHistory.h"
 
 // Console interface helpers. All clinical rules remain in VitalSigns/AlarmManager.
 void displayMenu() {
@@ -12,7 +13,7 @@ void displayMenu() {
               << "2. Display Vital Signs\n"
               << "3. Display Assessment\n"
               << "4. Display Calculations\n"
-              << "5. Display Heart Rate History\n"
+              << "5. Display Vital Signs History\n"
               << "6. Display Patient Information\n"
               << "7. Display Active Alarms\n"
               << "8. Exit\n"
@@ -45,7 +46,8 @@ bool readDouble(const char* prompt, double& value) {
 }
 
 // Read a complete set before changing the patient's actual measurements.
-void enterVitalSigns(ICU::VitalSigns& vitals, ICU::AlarmManager& alarms) {
+void enterVitalSigns(ICU::VitalSigns& vitals, ICU::AlarmManager& alarms,
+                     ICU::VitalHistory& history) {
     int systolicBP{};
     int diastolicBP{};
     int heartRate{};
@@ -91,7 +93,7 @@ void enterVitalSigns(ICU::VitalSigns& vitals, ICU::AlarmManager& alarms) {
     vitals.setSpO2(spo2);
     vitals.setRespRate(respRate);
     vitals.setTemperature(temperature);
-    vitals.addHeartRateReading(heartRate);
+    history.addReading(vitals);
 
     alarms.evaluate(vitals);
     std::cout << "\nVital signs updated successfully!\n";
@@ -148,10 +150,9 @@ void displayCalculations(const ICU::VitalSigns& vitals) {
     }
 }
 
-void displayHeartRateHistory(const ICU::VitalSigns& vitals) {
-    vitals.displayHeartRateHistory();
-    std::cout << "Average HR: " << vitals.calculateAverageHeartRate()
-              << " bpm\n";
+void displayVitalHistory(const ICU::VitalHistory& history) {
+    history.displayHistory();
+    history.displayHeartRateSummary();
 }
 
 void displayActiveAlarms(const ICU::VitalSigns& vitals,
@@ -165,6 +166,7 @@ int main() {
     ICU::Patient patient("P001", "Patient A", 65);
     ICU::VitalSigns& patientVitals = patient.getVitalSigns();
     ICU::AlarmManager alarmManager;
+    ICU::VitalHistory history;
 
     // Demonstration readings: the program begins with valid sample measurements.
     patientVitals.setHeartRate(80);
@@ -173,6 +175,7 @@ int main() {
     patientVitals.setDiastolicBP(80);
     patientVitals.setRespRate(16);
     patientVitals.setTemperature(37.0);
+    history.addReading(patientVitals); // Record the initial demonstration values
 
     std::cout << std::fixed << std::setprecision(2);
     patient.displayPatientInfo();
@@ -187,11 +190,11 @@ int main() {
         }
 
         switch (choice) {
-            case 1: enterVitalSigns(patientVitals, alarmManager); break;
+            case 1: enterVitalSigns(patientVitals, alarmManager, history); break;
             case 2: patientVitals.displayVitalSigns(); break;
             case 3: displayAssessment(patientVitals); break;
             case 4: displayCalculations(patientVitals); break;
-            case 5: displayHeartRateHistory(patientVitals); break;
+            case 5: displayVitalHistory(history); break;
             case 6: patient.displayPatientInfo(); break;
             case 7: displayActiveAlarms(patientVitals, alarmManager); break;
             case 8:
