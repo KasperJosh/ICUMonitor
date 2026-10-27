@@ -6,7 +6,8 @@
 #include <numeric>
 #include <fstream>
 #include <sstream>
-#include <string>
+#include <utility>
+#include <cmath>
 
 namespace ICU {
 
@@ -92,99 +93,59 @@ namespace ICU {
                   << static_cast<double>(totalHR) / records.size()
                   << " bpm\n";
     }
-
-    bool VitalHistory::saveToCSV(
-        const std::string& filename) const
-    {
+    bool VitalHistory::saveToCSV(const std::string& filename) const {
         std::ofstream file(filename);
-
-        if (!file.is_open()) {
-            return false;
+        if (!file) return false;
+        file << "timestamp,heartRate,spo2,systolicBP,diastolicBP,respRate,temperature\n";
+        for (const auto& r : records) {
+            file << r.timestamp << ',' << r.heartRate << ',' << r.spo2 << ','
+                 << r.systolicBP << ',' << r.diastolicBP << ',' << r.respRate
+                 << ',' << r.temperature << '\n';
         }
-
-        // Column headings
-        file << "timestamp,heartRate,spo2,"
-            << "systolicBP,diastolicBP,"
-            << "respRate,temperature\n";
-
-        // Write each stored record
-        for (const VitalRecord& record : records) {
-            file << record.timestamp << ","
-                << record.heartRate << ","
-                << record.spo2 << ","
-                << record.systolicBP << ","
-                << record.diastolicBP << ","
-                << record.respRate << ","
-                << record.temperature << "\n";
-        }
-
-        file.close();
-
+        file.flush();
         return file.good();
     }
 
-    
-    bool VitalHistory::loadFromCSV(
-        const std::string& filename)
-    {
+    bool VitalHistory::loadFromCSV(const std::string& filename) {
         std::ifstream file(filename);
-
-        if (!file.is_open()) {
-            return false;
-        }
-
+        if (!file) return false;
         std::string line;
-
-        // Skip CSV header
-        if (!std::getline(file, line)) {
+        if (!std::getline(file, line) ||
+            line != "timestamp,heartRate,spo2,systolicBP,diastolicBP,respRate,temperature")
             return false;
-        }
-
-        std::vector<VitalRecord> loadedRecords;
-
+        std::vector<VitalRecord> incoming;
         while (std::getline(file, line)) {
-            if (line.empty()) {
-                continue;
-            }
-
+            if (line.empty()) continue;
             std::stringstream ss(line);
-            VitalRecord record{};
-
-            char comma1, comma2, comma3;
-            char comma4, comma5, comma6;
-
-            if (!(ss >> record.timestamp
-                    >> comma1 >> record.heartRate
-                    >> comma2 >> record.spo2
-                    >> comma3 >> record.systolicBP
-                    >> comma4 >> record.diastolicBP
-                    >> comma5 >> record.respRate
-                    >> comma6 >> record.temperature)) {
-                return false;
-            }
-
-            if (comma1 != ',' || comma2 != ',' ||
-                comma3 != ',' || comma4 != ',' ||
-                comma5 != ',' || comma6 != ',') {
-                return false;
-            }
-
+            VitalRecord r{};
+            char a,b,c,d,e,f;
+            if (!(ss >> r.timestamp >> a >> r.heartRate >> b >> r.spo2
+                     >> c >> r.systolicBP >> d >> r.diastolicBP >> e >> r.respRate
+                     >> f >> r.temperature) ||
+                a != ',' || b != ',' || c != ',' || d != ',' || e != ',' || f != ',') return false;
             ss >> std::ws;
-            if (!ss.eof()) {
-                return false;
-            }
-
-            loadedRecords.push_back(record);
+            if (!ss.eof()) return false;
+            VitalSigns check(r.heartRate, r.spo2, r.systolicBP,
+                             r.diastolicBP, r.respRate, r.temperature);
+            if (r.timestamp < 0 || !check.isValidHeartRate() || !check.isValidSpO2() ||
+                !check.isValidBloodPressure() || !check.isValidRR() || !check.isValidTemp() ||
+                r.systolicBP <= r.diastolicBP || !std::isfinite(r.temperature)) return false;
+            incoming.push_back(r);
         }
-
-        if (file.bad()) {
-            return false;
-        }
-
-        // Replace history only after successful parsing
-        records = std::move(loadedRecords);
-
+        if (file.bad()) return false;
+        records = std::move(incoming);
         return true;
     }
 
+    bool VitalHistory::restoreLatest(VitalSigns& vitals) const {
+        if (records.empty()) return false;
+        const auto& r = records.back();
+        vitals.setHeartRate(r.heartRate);
+        vitals.setSpO2(r.spo2);
+        vitals.setSystolicBP(r.systolicBP);
+        vitals.setDiastolicBP(r.diastolicBP);
+        vitals.setRespRate(r.respRate);
+        vitals.setTemperature(r.temperature);
+        return true;
+    }
 }

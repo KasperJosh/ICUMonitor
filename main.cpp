@@ -1,224 +1,156 @@
 #include <iostream>
 #include <iomanip>
 #include <limits>
+#include <string>
+#include "PatientManager.h"
 
-#include "Patient.h"
-#include "AlarmManager.h"
-#include "VitalHistory.h"
+namespace {
+const std::string REGISTRY = "patients.csv";
 
-// Console interface helpers. All clinical rules remain in VitalSigns/AlarmManager.
-void displayMenu() {
-    std::cout << "\n===== ICU PATIENT MONITOR =====\n"
-              << "1. Enter Vital Signs\n"
-              << "2. Display Vital Signs\n"
-              << "3. Display Assessment\n"
-              << "4. Display Calculations\n"
-              << "5. Display Vital Signs History\n"
-              << "6. Display Patient Information\n"
-              << "7. Display Active Alarms\n"
-              << "8. Exit\n"
-              << "Choice: ";
-}
-
-// Returns false when input cannot be read as an integer.
-bool readMenuChoice(int& choice) {
-    if (std::cin >> choice) {
-        return true;
+bool readInt(const std::string& prompt, int& value) {
+    std::cout << prompt;
+    if (std::cin >> value) return true;
+    if (!std::cin.eof()) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
-    if (std::cin.eof()) {
-        return false;
-    }
-    std::cout << "Invalid input. Enter a number.\n";
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cout << "Invalid numeric input.\n";
     return false;
 }
-
-// Small input helpers stop at the first invalid measurement.
-bool readInt(const char* prompt, int& value) {
+bool readDouble(const std::string& prompt, double& value) {
     std::cout << prompt;
-    return static_cast<bool>(std::cin >> value);
+    if (std::cin >> value) return true;
+    if (!std::cin.eof()) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+    std::cout << "Invalid numeric input.\n";
+    return false;
 }
-
-bool readDouble(const char* prompt, double& value) {
-    std::cout << prompt;
-    return static_cast<bool>(std::cin >> value);
+void menu(const ICU::PatientSession* selected) {
+    std::cout << "\n===== ICU PATIENT MONITOR =====\n"
+              << "Selected: " << (selected ? selected->patient.getPatientID() : "None") << '\n'
+              << "1. Enter Vital Signs\n2. Display Vital Signs\n3. Display Assessment\n"
+              << "4. Display Calculations\n5. Display Vital Signs History\n"
+              << "6. Display Patient Information\n7. Display Active Alarms\n"
+              << "8. List Patients\n9. Add Patient\n10. Select Patient\n"
+              << "11. Remove Patient\n12. Save Data\n13. Exit\n";
 }
-
-// Read a complete set before changing the patient's actual measurements.
-void enterVitalSigns(ICU::VitalSigns& vitals, ICU::AlarmManager& alarms,
-                     ICU::VitalHistory& history) {
-    int systolicBP{};
-    int diastolicBP{};
-    int heartRate{};
-    int spo2{};
-    int respRate{};
-    double temperature{};
-
+void inputVitals(ICU::PatientSession& p) {
+    int sys{}, dia{}, hr{}, spo{}, rr{}; double t{};
     std::cout << "\n===== ENTER VITAL SIGNS =====\n";
-    bool inputOK =
-        readInt("Enter Systolic BP: ", systolicBP) &&
-        readInt("Enter Diastolic BP: ", diastolicBP) &&
-        readInt("Enter Heart Rate: ", heartRate) &&
-        readInt("Enter SpO2: ", spo2) &&
-        readInt("Enter Respiratory Rate: ", respRate) &&
-        readDouble("Enter Temperature: ", temperature);
-
-    if (!inputOK) {
-        std::cout << "Invalid numeric input. No changes saved.\n";
-        if (!std::cin.eof()) {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        }
+    if (!readInt("Systolic BP: ",sys) || !readInt("Diastolic BP: ",dia) ||
+        !readInt("Heart Rate: ",hr) || !readInt("SpO2: ",spo) ||
+        !readInt("Respiratory Rate: ",rr) || !readDouble("Temperature: ",t)) return;
+    ICU::VitalSigns candidate(hr,spo,sys,dia,rr,t);
+    if (!candidate.isValidHeartRate() || !candidate.isValidSpO2() ||
+        !candidate.isValidBloodPressure() || !candidate.isValidRR() ||
+        !candidate.isValidTemp() || sys <= dia) {
+        std::cout << "Invalid measurements. No changes saved.\n";
         return;
     }
-
-    ICU::VitalSigns candidate(heartRate, spo2, systolicBP,
-                              diastolicBP, respRate, temperature);
-    bool valid = candidate.isValidHeartRate() &&
-                 candidate.isValidSpO2() &&
-                 candidate.isValidBloodPressure() &&
-                 candidate.isValidRR() &&
-                 candidate.isValidTemp() &&
-                 systolicBP > diastolicBP;
-
-    if (!valid) {
-        std::cout << "Invalid vital signs. No changes saved.\n";
-        return;
-    }
-
-    vitals.setSystolicBP(systolicBP);
-    vitals.setDiastolicBP(diastolicBP);
-    vitals.setHeartRate(heartRate);
-    vitals.setSpO2(spo2);
-    vitals.setRespRate(respRate);
-    vitals.setTemperature(temperature);
-    history.addReading(vitals);
-
-    alarms.evaluate(vitals);
-    std::cout << "\nVital signs updated successfully!\n";
-    if (alarms.getAlarmCount() > 0) {
-        std::cout << "WARNING: " << alarms.getAlarmCount()
-                  << " active alarm(s) detected.\n";
-    } else {
-        std::cout << "No active alarms.\n";
-    }
+    p.patient.getVitalSigns() = candidate;
+    p.hasVitals = true;
+    p.history.addReading(p.patient.getVitalSigns());
+    p.alarms.evaluate(p.patient.getVitalSigns());
+    std::cout << "Readings updated. Active alarms: " << p.alarms.getAlarmCount() << '\n';
 }
-
-void displayAssessment(const ICU::VitalSigns& vitals) {
+void assessment(const ICU::VitalSigns& v) {
     std::cout << "\n===== ASSESSMENT =====\n" << std::left;
-
-    if (vitals.isValidBloodPressure() &&
-        vitals.getSystolicBP() > vitals.getDiastolicBP()) {
-        vitals.checkBP();
-    } else {
-        std::cout << "Invalid Blood Pressure\n";
-    }
-
-    if (vitals.isValidHeartRate()) vitals.checkHeartRate();
-    else std::cout << "Invalid Heart Rate\n";
-
-    if (vitals.isValidSpO2()) vitals.checkSpO2();
-    else std::cout << "Invalid SpO2\n";
-
-    if (vitals.isValidRR()) vitals.checkRespRate();
-    else std::cout << "Invalid Respiratory Rate\n";
-
-    if (vitals.isValidTemp()) vitals.checkTemperature();
-    else std::cout << "Invalid Temperature\n";
+    v.checkBP(); v.checkHeartRate(); v.checkSpO2(); v.checkRespRate(); v.checkTemperature();
 }
-
-void displayCalculations(const ICU::VitalSigns& vitals) {
-    std::cout << "\n===== CALCULATIONS =====\n" << std::left;
-    bool bpValid = vitals.isValidBloodPressure() &&
-                   vitals.getSystolicBP() > vitals.getDiastolicBP();
-
-    if (bpValid) {
-        std::cout << std::setw(20) << "MAP: "
-                  << vitals.calculateMAP() << " mmHg\n";
-        std::cout << std::setw(20) << "Pulse Pressure: "
-                  << vitals.calculatePulsePressure() << " mmHg\n";
-    } else {
-        std::cout << "BP calculations unavailable.\n";
-    }
-
-    if (bpValid && vitals.isValidHeartRate()) {
-        std::cout << std::setw(20) << "Shock Index: "
-                  << vitals.calculateShockIndex() << '\n';
-    } else {
-        std::cout << "Shock Index unavailable.\n";
-    }
+void calculations(const ICU::VitalSigns& v) {
+    std::cout << "\n===== CALCULATIONS =====\n"
+              << "MAP: " << v.calculateMAP() << " mmHg\n"
+              << "Pulse Pressure: " << v.calculatePulsePressure() << " mmHg\n"
+              << "Shock Index: " << v.calculateShockIndex() << '\n';
 }
-
-void displayVitalHistory(const ICU::VitalHistory& history) {
-    history.displayHistory();
-    history.displayHeartRateSummary();
+std::string readLine(const std::string& prompt) {
+    std::cout << prompt;
+    std::string result;
+    std::getline(std::cin >> std::ws, result);
+    return result;
 }
-
-void displayActiveAlarms(const ICU::VitalSigns& vitals,
-                         ICU::AlarmManager& alarms) {
-    alarms.evaluate(vitals);
-    alarms.displayAlarms();
-    std::cout << "\nTotal Active Alarms: " << alarms.getAlarmCount() << '\n';
+void addPatient(ICU::PatientManager& manager, std::string& selectedID) {
+    auto id = readLine("New patient ID (letters/numbers/-/_): ");
+    auto name = readLine("Patient display name: ");
+    int age;
+    if (!readInt("Age: ", age)) return;
+    if (manager.addPatient(id,name,age)) {
+        selectedID = id;
+        std::cout << "Patient created and selected.\n";
+    } else std::cout << "Could not create patient (invalid or duplicate ID/data).\n";
 }
-
+bool saveAll(const ICU::PatientManager& manager) {
+    // Save each history before writing the registry.
+    bool ok = manager.saveAllHistories();
+    if (ok) ok = manager.saveRegistry(REGISTRY);
+    std::cout << (ok ? "Patient registry and histories saved.\n" : "ERROR saving patient data.\n");
+    return ok;
+}
+}
 int main() {
-    ICU::Patient patient("P001", "Patient A", 65);
-    ICU::VitalSigns& patientVitals = patient.getVitalSigns();
-    ICU::AlarmManager alarmManager;
-    ICU::VitalHistory history;
-
-    const std::string filename = "vitals_P001.csv";
-
-    if (history.loadFromCSV(filename)) {
-        std::cout << "Previous history loaded.\n";
+    ICU::PatientManager manager;
+    if (manager.loadRegistry(REGISTRY)) {
+        std::cout << "Saved patients and their histories loaded.\n";
+    } else {
+        // Migration: preserve the existing P001 history if it exists.
+        manager.addPatient("P001", "Patient A", 65);
+        auto* p = manager.findPatient("P001");
+        if (p->history.loadFromCSV("vitals_P001.csv"))
+            p->hasVitals = p->history.restoreLatest(p->patient.getVitalSigns());
+        std::cout << "Started with P001. Previous history loaded if available.\n";
     }
-    else {
-        std::cout << "No valid saved history found.\n";
-    }
-
-    // Demonstration readings: the program begins with valid sample measurements.
-    patientVitals.setHeartRate(80);
-    patientVitals.setSpO2(90);
-    patientVitals.setSystolicBP(120);
-    patientVitals.setDiastolicBP(80);
-    patientVitals.setRespRate(16);
-    patientVitals.setTemperature(37.0);
-    history.addReading(patientVitals); // Record the initial demonstration values
-
+    std::string selectedID = manager.findPatient("P001") ? "P001" : "";
     std::cout << std::fixed << std::setprecision(2);
-    patient.displayPatientInfo();
-    patientVitals.displayVitalSigns();
-
     while (true) {
-        displayMenu();
-        int choice = 0;
-        if (!readMenuChoice(choice)) {
+        ICU::PatientSession* p = manager.findPatient(selectedID);
+        menu(p);
+        int choice{};
+        if (!readInt("Choice: ",choice)) {
             if (std::cin.eof()) break;
             continue;
         }
-
+        if (choice == 13) { saveAll(manager); break; }
         switch (choice) {
-            case 1: enterVitalSigns(patientVitals, alarmManager, history); break;
-            case 2: patientVitals.displayVitalSigns(); break;
-            case 3: displayAssessment(patientVitals); break;
-            case 4: displayCalculations(patientVitals); break;
-            case 5: displayVitalHistory(history); break;
-            case 6: patient.displayPatientInfo(); break;
-            case 7: displayActiveAlarms(patientVitals, alarmManager); break;
-            case 8:
-                if (history.saveToCSV(filename)) {
-                    std::cout << "Vital history saved.\n";
+            case 8: manager.displayPatients(); break;
+            case 9: addPatient(manager, selectedID); break;
+            case 10: {
+                auto id = readLine("Patient ID to select: ");
+                if (manager.findPatient(id)) { selectedID=id; std::cout << "Selected " << id << '\n'; }
+                else std::cout << "Patient not found.\n";
+                break;
+            }
+            case 11: {
+                auto id = readLine("Patient ID to remove: ");
+                // Delete persisted file only after an explicit separate manual cleanup;
+                // deleting registry membership does not erase historical CSV files.
+                if (manager.removePatient(id)) {
+                    if (selectedID==id) selectedID="";
+                    std::cout << "Patient removed from active roster (CSV retained).\n";
+                } else std::cout << "Patient not found.\n";
+                break;
+            }
+            case 12: saveAll(manager); break;
+            default:
+                if (choice < 1 || choice > 7) { std::cout << "Invalid menu option.\n"; break; }
+                if (!p) { std::cout << "Select or add a patient first.\n"; break; }
+                if (choice == 1) { inputVitals(*p); break; }
+                if (choice == 6) { p->patient.displayPatientInfo(); break; }
+                if (choice == 5) { p->history.displayHistory(); p->history.displayHeartRateSummary(); break; }
+                if (!p->hasVitals) { std::cout << "Enter vital signs for this patient first.\n"; break; }
+                switch (choice) {
+                    case 2: p->patient.getVitalSigns().displayVitalSigns(); break;
+                    case 3: assessment(p->patient.getVitalSigns()); break;
+                    case 4: calculations(p->patient.getVitalSigns()); break;
+                    case 7:
+                        p->alarms.evaluate(p->patient.getVitalSigns());
+                        p->alarms.displayAlarms();
+                        std::cout << "Total Active Alarms: " << p->alarms.getAlarmCount() << '\n';
+                        break;
                 }
-                else {
-                    std::cout << "Error saving history.\n";
-                }
-
-                std::cout << "Exiting ICU Monitor...\n";
-                return 0;
-                        default: std::cout << "Invalid menu option.\n";
-                    }
-                    if (std::cin.eof()) break;
-                }
+        }
+        if (std::cin.eof()) break;
+    }
     return 0;
 }

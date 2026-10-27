@@ -3,8 +3,8 @@
 
 #include <ctime>
 #include <vector>
-#include "VitalSigns.h"
 #include <string>
+#include "VitalSigns.h"
 
 namespace ICU {
 
@@ -28,10 +28,9 @@ namespace ICU {
         void displayHistory() const;
         void displayHeartRateSummary() const;
         std::size_t getReadingCount() const;
-        
-        // Implementing functions to save data into CSV file
-        bool saveToCSV (const std::string& filename) const;
+        bool saveToCSV(const std::string& filename) const;
         bool loadFromCSV(const std::string& filename);
+        bool restoreLatest(VitalSigns& vitals) const;
     };
 }
 
