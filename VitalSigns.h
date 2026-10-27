@@ -1,7 +1,6 @@
 #ifndef VITALSIGNS_H
 #define VITALSIGNS_H
 
-#include <vector>
 
 namespace ICU{
     
@@ -14,7 +13,6 @@ namespace ICU{
             int respRate;
             double temperature;
 
-            std::vector<int> heartRateHistory;
 
         public:
 
@@ -57,11 +55,6 @@ namespace ICU{
 
             void displayVitalSigns() const;
     
-            void addHeartRateReading(int heartRate);
-            void displayHeartRateHistory() const;
-            double calculateAverageHeartRate() const;
-            
-
         }; 
 
 

@@ -2,6 +2,8 @@
 #include <iomanip>
 #include <limits>
 #include <string>
+#include <fstream>
+#include <cmath>
 #include "PatientManager.h"
 
 namespace {
@@ -45,7 +47,7 @@ void inputVitals(ICU::PatientSession& p) {
     ICU::VitalSigns candidate(hr,spo,sys,dia,rr,t);
     if (!candidate.isValidHeartRate() || !candidate.isValidSpO2() ||
         !candidate.isValidBloodPressure() || !candidate.isValidRR() ||
-        !candidate.isValidTemp() || sys <= dia) {
+        !candidate.isValidTemp() || !std::isfinite(t) || sys <= dia) {
         std::cout << "Invalid measurements. No changes saved.\n";
         return;
     }
@@ -54,6 +56,8 @@ void inputVitals(ICU::PatientSession& p) {
     p.history.addReading(p.patient.getVitalSigns());
     p.alarms.evaluate(p.patient.getVitalSigns());
     std::cout << "Readings updated. Active alarms: " << p.alarms.getAlarmCount() << '\n';
+    if (!p.history.saveToCSV("vitals_" + p.patient.getPatientID() + ".csv"))
+        std::cerr << "WARNING: Failed to autosave this patient history.\n";
 }
 void assessment(const ICU::VitalSigns& v) {
     std::cout << "\n===== ASSESSMENT =====\n" << std::left;
@@ -79,7 +83,7 @@ void addPatient(ICU::PatientManager& manager, std::string& selectedID) {
     if (manager.addPatient(id,name,age)) {
         selectedID = id;
         std::cout << "Patient created and selected.\n";
-    } else std::cout << "Could not create patient (invalid or duplicate ID/data).\n";
+    } else std::cout << "Could not create patient (invalid, duplicate or previously used ID).\n";
 }
 bool saveAll(const ICU::PatientManager& manager) {
     // Save each history before writing the registry.
@@ -91,14 +95,26 @@ bool saveAll(const ICU::PatientManager& manager) {
 }
 int main() {
     ICU::PatientManager manager;
-    if (manager.loadRegistry(REGISTRY)) {
+    const bool registryExists = static_cast<bool>(std::ifstream(REGISTRY));
+    if (registryExists && !manager.loadRegistry(REGISTRY)) {
+        std::cerr << "ERROR: patients.csv is damaged or a patient history cannot be loaded.\n"
+                  << "No files have been overwritten. Restore from backup first.\n";
+        return 1;
+    }
+    if (registryExists) {
         std::cout << "Saved patients and their histories loaded.\n";
     } else {
         // Migration: preserve the existing P001 history if it exists.
-        manager.addPatient("P001", "Patient A", 65);
+        manager.addPatient("P001", "Patient A", 65, true);
         auto* p = manager.findPatient("P001");
-        if (p->history.loadFromCSV("vitals_P001.csv"))
+        if (std::ifstream("vitals_P001.csv").good()) {
+            if (!p->history.loadFromCSV("vitals_P001.csv")) {
+                std::cerr << "ERROR: Invalid legacy P001 history.\n";
+                return 1;
+            }
             p->hasVitals = p->history.restoreLatest(p->patient.getVitalSigns());
+            if (p->hasVitals) p->alarms.evaluate(p->patient.getVitalSigns());
+        }
         std::cout << "Started with P001. Previous history loaded if available.\n";
     }
     std::string selectedID = manager.findPatient("P001") ? "P001" : "";
@@ -111,10 +127,12 @@ int main() {
             if (std::cin.eof()) break;
             continue;
         }
-        if (choice == 13) { saveAll(manager); break; }
+        if (choice == 13) { return saveAll(manager) ? 0 : 1; }
         switch (choice) {
             case 8: manager.displayPatients(); break;
-            case 9: addPatient(manager, selectedID); break;
+            case 9: addPatient(manager, selectedID);
+                    if (!saveAll(manager)) std::cerr << "WARNING: Patient registry not saved.\n";
+                    break;
             case 10: {
                 auto id = readLine("Patient ID to select: ");
                 if (manager.findPatient(id)) { selectedID=id; std::cout << "Selected " << id << '\n'; }
@@ -128,6 +146,7 @@ int main() {
                 if (manager.removePatient(id)) {
                     if (selectedID==id) selectedID="";
                     std::cout << "Patient removed from active roster (CSV retained).\n";
+                    if (!saveAll(manager)) std::cerr << "WARNING: Removal not saved.\n";
                 } else std::cout << "Patient not found.\n";
                 break;
             }
@@ -152,5 +171,5 @@ int main() {
         }
         if (std::cin.eof()) break;
     }
-    return 0;
+    return saveAll(manager) ? 0 : 1;
 }

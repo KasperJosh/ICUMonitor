@@ -249,46 +249,5 @@ namespace ICU{
     }
 
 
-    // Storing a history of heart-rate readings
-    void VitalSigns::addHeartRateReading (int heartRate)
-    {
-        heartRateHistory.push_back(heartRate);
-    }
-
-    void VitalSigns::displayHeartRateHistory() const
-    {
-        if (heartRateHistory.empty())
-        {
-            std::cout << "No heart rate history available.\n";
-            return;
-        }
-
-        std::cout << "\n===== Heart Rate History =====\n";
-
-        for (int hr : heartRateHistory)
-        {
-            std::cout << hr << " bpm\n";
-        }
-    }
-
-    double VitalSigns::calculateAverageHeartRate() const
-    {
-        if (heartRateHistory.empty())
-        {
-            return 0.0;
-        }
-
-        int total = 0;
-
-        for (int hr : heartRateHistory)
-        {
-            total += hr;
-        }
-
-        return static_cast<double>(total) / heartRateHistory.size();
-    }
-
 
 }
-
-

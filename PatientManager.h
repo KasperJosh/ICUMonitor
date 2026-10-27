@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <set>
 #include "Patient.h"
 #include "VitalHistory.h"
 #include "AlarmManager.h"
@@ -18,8 +19,9 @@ struct PatientSession {
 class PatientManager {
 private:
     std::vector<std::unique_ptr<PatientSession>> patients;
+    std::set<std::string> retiredIDs;
 public:
-    bool addPatient(const std::string& id, const std::string& name, int age);
+    bool addPatient(const std::string& id, const std::string& name, int age, bool legacyImport = false);
     bool removePatient(const std::string& id);
     PatientSession* findPatient(const std::string& id);
     const PatientSession* findPatient(const std::string& id) const;
